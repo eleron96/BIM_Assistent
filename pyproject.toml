@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "telegram-bot"
+version = "0.1.0"
+description = ""
+authors = ["nikogamsahurdia <eleron96@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+aiogram = "^3.7.0"
+python-dotenv = "^1.0.1"
+requests = "^2.32.3"
+aiohttp = "^3.9.5"
+python-telegram-bot = {extras = ["job-queue"], version = "^21.3"}
+python-decouple = "^3.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
