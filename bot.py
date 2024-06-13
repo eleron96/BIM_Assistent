@@ -9,11 +9,13 @@ import os
 from telegram_bot.speckle_projects import get_speckle_projects
 from telegram_bot.speckle_models import get_project_models_and_commits
 from datetime import datetime
+from specklepy.api.client import SpeckleClient
 
-# Загрузка токена из файла .env
+# Загрузка токенов из файла .env
 load_dotenv()
 TOKEN = os.getenv('BOT_TOKEN')
 HOST = os.getenv('HOST')
+SPECKLE_TOKEN = os.getenv('SPECKLE_TOKEN')
 
 # Включаем логирование
 logging.basicConfig(
@@ -26,6 +28,9 @@ logger = logging.getLogger(__name__)
 # Определяем состояния для ConversationHandler
 SELECTING_PROJECT, SHOWING_MODELS, MAIN_MENU = range(3)
 
+# Настройка клиента Speckle
+speckle_client = SpeckleClient(host=HOST)
+speckle_client.authenticate_with_token(SPECKLE_TOKEN)
 
 # Определяем функцию для обработки команд /start и /help
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -33,81 +38,89 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         'Привет! Отправь мне сообщение, и я верну его тебе!')
 
 
-async def help_command(update: Update,
-                       context: ContextTypes.DEFAULT_TYPE) -> None:
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         'Просто отправь мне любое сообщение, и я отвечу тем же.')
 
 
-async def stop_command(update: Update,
-                       context: ContextTypes.DEFAULT_TYPE) -> None:
+async def stop_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text('Бот остановлен.')
     # Остановка бота
     await context.application.stop()
 
 
-async def exit_command(update: Update,
-                       context: ContextTypes.DEFAULT_TYPE) -> int:
+async def exit_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await update.message.reply_text(
         'Вы вернулись к начальному состоянию. Введите команду.')
     return MAIN_MENU
 
 
 # Функция для обработки запроса "покажи проекты"
-async def show_projects(update: Update,
-                        context: ContextTypes.DEFAULT_TYPE) -> int:
-    projects = get_speckle_projects()
-    buttons = [
-        [InlineKeyboardButton(f"{project.name}", callback_data=project.id)]
-        for project in projects
-    ]
-    reply_markup = InlineKeyboardMarkup(buttons)
-    await update.message.reply_text(
-        text="Проекты:",
-        reply_markup=reply_markup
-    )
-    return SELECTING_PROJECT
+async def show_projects(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    try:
+        projects = get_speckle_projects(speckle_client)  # передаем клиент
+        buttons = [
+            [InlineKeyboardButton(f"{project.name}", callback_data=project.id)]
+            for project in projects
+        ]
+        reply_markup = InlineKeyboardMarkup(buttons)
+        await update.message.reply_text(
+            text="Проекты:",
+            reply_markup=reply_markup
+        )
+        return SELECTING_PROJECT
+    except Exception as e:
+        logger.error(f"Error in show_projects: {e}")
+        await update.message.reply_text(
+            text="Ошибка при получении проектов."
+        )
+        return MAIN_MENU
 
 
 # Функция для обработки выбора проекта
-async def project_selected(update: Update,
-                           context: ContextTypes.DEFAULT_TYPE) -> int:
-    query = update.callback_query
-    await query.answer()
-    project_id = query.data
+async def project_selected(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    try:
+        query = update.callback_query
+        await query.answer()
+        project_id = query.data
 
-    # Получение моделей и последних коммитов проекта
-    models = get_project_models_and_commits(project_id)
-    messages = []
-    for model in models:
-        last_commit_message = model['latest_commit_message']
-        last_commit_id = model['latest_commit_id']
-        if last_commit_id:
-            last_commit_date = datetime.strptime(last_commit_message,
-                                                 "%d.%m.%y").strftime(
-                "%d %B %Y")
-            commit_message = f"Информация о модели {model['name']}, дата последнего коммита: {last_commit_date}"
-            commit_button = InlineKeyboardButton("Ссылка на последний коммит",
-                                                 url=f"{HOST}streams/{project_id}/commits/{last_commit_id}")
-        else:
-            commit_message = f"Информация о модели {model['name']}, коммитов нет"
-            commit_button = None
+        # Получение моделей и последних коммитов проекта
+        models = get_project_models_and_commits(speckle_client, project_id)  # передаем клиент и id проекта
+        messages = []
+        for model in models:
+            last_commit_message = model['latest_commit_message']
+            last_commit_id = model['latest_commit_id']
+            if last_commit_id:
+                last_commit_date = datetime.strptime(last_commit_message, "%d.%m.%y").strftime(
+                    "%d %B %Y")
+                commit_message = f"Информация о модели {model['name']}, дата последнего коммита: {last_commit_date}"
+                commit_button = InlineKeyboardButton("Ссылка на последний коммит",
+                                                     url=f"{HOST}streams/{project_id}/commits/{last_commit_id}")
+            else:
+                commit_message = f"Информация о модели {model['name']}, коммитов нет"
+                commit_button = None
 
-        message = {
-            "text": commit_message,
-            "button": commit_button
-        }
-        messages.append(message)
+            message = {
+                "text": commit_message,
+                "button": commit_button
+            }
+            messages.append(message)
 
-    for message in messages:
-        if message["button"]:
-            reply_markup = InlineKeyboardMarkup([[message["button"]]])
-            await query.message.reply_text(text=message["text"],
-                                           reply_markup=reply_markup)
-        else:
-            await query.message.reply_text(text=message["text"])
+        for message in messages:
+            if message["button"]:
+                reply_markup = InlineKeyboardMarkup([[message["button"]]])
+                await query.message.reply_text(text=message["text"],
+                                               reply_markup=reply_markup)
+            else:
+                await query.message.reply_text(text=message["text"])
 
-    return SHOWING_MODELS
+        return SHOWING_MODELS
+    except Exception as e:
+        logger.error(f"Error in project_selected: {e}")
+        await update.callback_query.message.reply_text(
+            text="Ошибка при обработке выбора проекта."
+        )
+        return MAIN_MENU
 
 
 # Функция для обработки текстовых сообщений

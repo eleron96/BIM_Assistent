@@ -1,17 +1,6 @@
-# telegram_bot/speckle_models.py
 from specklepy.api.client import SpeckleClient
-from specklepy.api.credentials import get_default_account
-from decouple import config
 
-def get_project_models_and_commits(project_id):
-    # Extracting configuration data from environment variables or .env file
-    HOST = config('HOST')
-
-    # Create and authenticate the client
-    client = SpeckleClient(host=HOST)
-    account = get_default_account()
-    client.authenticate_with_account(account)
-
+def get_project_models_and_commits(client: SpeckleClient, project_id: str):
     # Get the list of branches (models) for the specified project (stream)
     branches = client.branch.list(project_id)
 

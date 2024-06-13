@@ -3,7 +3,7 @@ from specklepy.api.client import SpeckleClient
 from specklepy.api.credentials import get_default_account
 from decouple import config
 
-def get_project_commits(project_id):
+def get_commit_comments(stream_id, commit_id):
     # Extracting configuration data from environment variables or .env file
     HOST = config('HOST')
 
@@ -12,7 +12,9 @@ def get_project_commits(project_id):
     account = get_default_account()
     client.authenticate_with_account(account)
 
-    # Get the list of commits for the specified project (stream)
-    commits = client.commit.list(project_id)
+    # Get the commit details, including comments
+    commit = client.commit.get(stream_id, commit_id)
+    # Access comments from commit if available
+    comments = commit.comments if hasattr(commit, 'comments') else []
 
-    return commits
+    return comments
