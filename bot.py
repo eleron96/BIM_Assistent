@@ -66,7 +66,9 @@ async def show_projects(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
         reply_markup = InlineKeyboardMarkup(buttons)
         await update.message.reply_text(
             text="Проекты:",
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
+            disable_notification=True,
+            reply_to_message_id=update.message.message_id
         )
         return SELECTING_PROJECT
     except Exception as e:
@@ -93,11 +95,11 @@ async def project_selected(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             if last_commit_id:
                 last_commit_date = datetime.strptime(last_commit_message, "%d.%m.%y").strftime(
                     "%d %B %Y")
-                commit_message = f"Информация о модели {model['name']}, дата последнего коммита: {last_commit_date}"
+                commit_message = f"*Имя модели* - {model['name']}\n*Дата последнего коммита* - {last_commit_date}"
                 commit_button = InlineKeyboardButton("Ссылка на последний коммит",
                                                      url=f"{HOST}streams/{project_id}/commits/{last_commit_id}")
             else:
-                commit_message = f"Информация о модели {model['name']}, коммитов нет"
+                commit_message = f"❗️В модели *{model['name']}*, коммитов нет"
                 commit_button = None
 
             message = {
@@ -110,9 +112,11 @@ async def project_selected(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             if message["button"]:
                 reply_markup = InlineKeyboardMarkup([[message["button"]]])
                 await query.message.reply_text(text=message["text"],
+                                               parse_mode='Markdown',
                                                reply_markup=reply_markup)
             else:
-                await query.message.reply_text(text=message["text"])
+                await query.message.reply_text(text=message["text"],
+                                               parse_mode='Markdown',)
 
         return SHOWING_MODELS
     except Exception as e:
