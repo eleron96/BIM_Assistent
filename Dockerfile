@@ -6,6 +6,9 @@ RUN apt-get update && apt-get install -y \
     gcc \
     libffi-dev \
     libssl-dev \
+    sudo \
+    systemd \
+    systemd-sysv \
     && rm -rf /var/lib/apt/lists/*
 
 # Устанавливаем pip и Poetry
