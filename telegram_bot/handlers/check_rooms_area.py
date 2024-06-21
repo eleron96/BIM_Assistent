@@ -107,8 +107,8 @@ async def select_project(update: Update, context: CallbackContext):
     selected_project = update.message.text
     logging.debug(f"Selected project: {selected_project}")
 
-    # context.user_data['selected_project'] = selected_project
-    # await update.message.reply_text(f"Selected project: {selected_project}")
+    context.user_data['selected_project'] = selected_project
+    await update.message.reply_text(f"Selected project: {selected_project}")
 
     try:
         stream_id = get_speckle_stream_id(selected_project)
