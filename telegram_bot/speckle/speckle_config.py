@@ -1,17 +1,18 @@
-# config.py
+# telegram_bot/speckle/speckle_config.py
 from specklepy.api.client import SpeckleClient
 from specklepy.api.credentials import get_default_account
 from decouple import config
+from .speckle_projects import get_speckle_projects
 
-stream_id = select_speckle_stream()
-print(f"Used STREAM_ID: {stream_id}")
-
-# Extracting configuration data from environment variables or .env file
 HOST = config('HOST')
-# STREAM_ID = config('STREAM_ID') # Retrieved manually from .env
-STREAM_ID = stream_id
 
-# Create and authenticate the client
 client = SpeckleClient(host=HOST)
 account = get_default_account()
 client.authenticate_with_account(account)
+
+def get_speckle_stream_id(project_name):
+    projects = get_speckle_projects(client)
+    for project in projects:
+        if project.name == project_name:
+            return project.id
+    return None

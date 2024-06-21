@@ -1,3 +1,4 @@
+# bot.py
 from telegram.ext import ApplicationBuilder
 from telegram_bot.config import TOKEN
 from telegram_bot.handlers import register_handlers
