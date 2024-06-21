@@ -5,12 +5,14 @@ from telegram_bot.handlers.stop_handler import stop_command
 from telegram_bot.handlers.echo_handler import echo
 from telegram_bot.handlers.server_status import server_status
 from telegram_bot.handlers.server_restart import server_restart
+from telegram_bot.handlers.check_rooms_area import check_area_discrepancy
 from telegram_bot.handlers.projects_handler import conv_handler
 
 def register_handlers(app):
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("stop", stop_command))
+    app.add_handler(CommandHandler("check_rooms_area", check_area_discrepancy))
     app.add_handler(CommandHandler("server", server_status))
     app.add_handler(CommandHandler("restart", server_restart))
     app.add_handler(conv_handler)

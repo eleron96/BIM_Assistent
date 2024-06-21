@@ -19,3 +19,8 @@ run: stop build
 update: run
 
 .PHONY: build stop run update
+
+# Создание пакета и отправка на сервер
+package:
+	tar czvf telegram_bot_files.tar.gz Dockerfile bot.py main.py pyproject.toml poetry.lock telegram_bot .env
+	scp telegram_bot_files.tar.gz root@194.35.119.49:/root/
