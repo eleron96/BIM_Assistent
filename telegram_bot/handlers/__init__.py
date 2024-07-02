@@ -8,6 +8,7 @@ from telegram_bot.handlers.server_status import server_status
 from telegram_bot.handlers.server_restart import server_restart
 from telegram_bot.handlers.check_rooms_area import check_area_discrepancy_handler
 from telegram_bot.handlers.projects_handler import conv_handler
+from telegram_bot.toggl.stat_by_user import stat_by_user
 
 def register_handlers(app):
     app.add_handler(CommandHandler("start", start))
@@ -16,5 +17,6 @@ def register_handlers(app):
     app.add_handler(check_area_discrepancy_handler)
     app.add_handler(CommandHandler("server", server_status))
     app.add_handler(CommandHandler("restart", server_restart))
+    app.add_handler(CommandHandler("stat_by_user", stat_by_user))
     app.add_handler(conv_handler)
     # app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))

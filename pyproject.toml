@@ -17,6 +17,10 @@ psutil = "^6.0.0"
 pexpect = "^4.9.0"
 docker = "^7.1.0"
 rich = "^13.7.1"
+pillow = "^10.4.0"
+matplotlib = "^3.9.0"
+pandas = "^2.2.2"
+pyautogui = "^0.9.54"
 
 
 [build-system]
