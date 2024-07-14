@@ -22,6 +22,7 @@ matplotlib = "^3.9.0"
 pandas = "^2.2.2"
 pyautogui = "^0.9.54"
 coloredlogs = "^15.0.1"
+icalendar = "^5.0.13"
 
 
 [build-system]

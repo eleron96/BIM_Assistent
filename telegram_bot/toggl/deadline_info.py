@@ -3,12 +3,12 @@ import logging
 from dotenv import load_dotenv
 import os
 from datetime import datetime, timedelta
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 
 # Настройка логирования
 logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s - %(levellevel)s - %(message)s',
+                    format='%(asctime)s - %(levelname)s - %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
 
 # Загрузка переменных окружения из файла .env
@@ -69,7 +69,6 @@ async def deadline_info(update: Update, context: CallbackContext):
     milestones = await fetch_milestones()
 
     if isinstance(milestones, list):
-        # Разделение на прошедшие и предстоящие milestones
         past_milestones = []
         upcoming_milestones = []
         now = datetime.now().date()
@@ -84,16 +83,13 @@ async def deadline_info(update: Update, context: CallbackContext):
                 elif now <= deadline <= next_month:
                     upcoming_milestones.append(milestone)
 
-        # Сортировка milestones по дате
         past_milestones.sort(key=lambda x: datetime.fromisoformat(x.get('date')).date())
         upcoming_milestones.sort(key=lambda x: datetime.fromisoformat(x.get('date')).date())
 
-        # Формирование текста отчета
         report_lines = ["Completed milestones:"]
         for milestone in past_milestones:
             deadline = format_date(milestone.get('date', 'N/A'))
             name = milestone.get('name', 'N/A')
-            milestone_id = milestone.get('id', 'N/A')
             project_code, clean_name = extract_code_and_name(name)
             report_lines.append(f"{deadline:<8}|{clean_name[:21]:<21}|{project_code[:10]:<7}")
 
@@ -101,12 +97,18 @@ async def deadline_info(update: Update, context: CallbackContext):
         for milestone in upcoming_milestones:
             deadline = format_date(milestone.get('date', 'N/A'))
             name = milestone.get('name', 'N/A')
-            milestone_id = milestone.get('id', 'N/A')
             project_code, clean_name = extract_code_and_name(name)
             report_lines.append(f"{deadline:<8}|{clean_name[:21]:<21}|{project_code[:10]:<7}")
 
         report_text = "\n".join(report_lines)
-        await update.message.reply_text(f"```\n{report_text}\n```", parse_mode="Markdown", disable_notification=True)
+
+        keyboard = [
+            [InlineKeyboardButton("Add to Calendar", callback_data='add_to_calendar')],
+            [InlineKeyboardButton("Back", callback_data='back_from_info')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        await update.message.reply_text(f"```\n{report_text}\n```", parse_mode="Markdown", disable_notification=True, reply_markup=reply_markup)
     else:
         logging.error(milestones.get("error", "Неизвестная ошибка"))
         await update.message.reply_text("Ошибка получения информации о вехах", parse_mode="Markdown", disable_notification=True)
