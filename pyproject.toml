@@ -23,6 +23,7 @@ pandas = "^2.2.2"
 pyautogui = "^0.9.54"
 coloredlogs = "^15.0.1"
 icalendar = "^5.0.13"
+openai = "^1.36.1"
 
 
 [build-system]
