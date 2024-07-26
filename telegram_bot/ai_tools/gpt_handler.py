@@ -1,5 +1,6 @@
 import os
 import logging
+import re
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import CallbackContext, CommandHandler, MessageHandler, filters, ConversationHandler
@@ -27,7 +28,7 @@ ASKING = 1
 # Функция для получения ответа от ChatGPT с учетом истории
 def fetch_chatgpt_response(messages):
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4o-mini",
         messages=messages
     )
     return response.choices[0].message.content.strip()
@@ -71,7 +72,7 @@ async def handle_message(update: Update, context: CallbackContext):
     response = fetch_chatgpt_response(chat_histories[chat_id])
 
     # Отправка ответа пользователю
-    await context.bot.send_message(chat_id=chat_id, text=response)
+    await context.bot.send_message(chat_id=chat_id, text=response, parse_mode='Markdown')
 
     # Добавление ответа ChatGPT в историю
     chat_histories[chat_id].append({"role": "assistant", "content": response})
@@ -107,4 +108,3 @@ gpt_conversation_handler = ConversationHandler(
 # Добавление задачи для проверки бездействия
 def add_inactivity_job(job_queue):
     job_queue.run_repeating(check_inactivity, interval=60, first=60)
-
