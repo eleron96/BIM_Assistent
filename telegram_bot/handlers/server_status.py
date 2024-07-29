@@ -6,6 +6,9 @@ from telegram import Update
 from telegram.ext import CallbackContext
 import asyncio
 
+from telegram_bot.handlers.security_check import is_user_whitelisted
+
+
 async def collect_net_stats(interval=5):
     net_io_1 = psutil.net_io_counters()
     await asyncio.sleep(interval)
@@ -52,6 +55,11 @@ def get_server_status():
     return status
 
 async def server_status(update: Update, context: CallbackContext):
+    user_id = update.effective_user.id
+    if not is_user_whitelisted(user_id):
+        await update.message.reply_text('Отказано в доступе.')
+        return
+
     status = get_server_status()
     sent_speed, recv_speed, sent_mb, recv_mb = await collect_net_stats()
     message = (

@@ -5,6 +5,8 @@ from telegram import Update
 from telegram.ext import CallbackContext
 from dotenv import load_dotenv
 
+from telegram_bot.handlers.security_check import is_user_whitelisted
+
 # Загрузка переменных окружения из .env файла
 load_dotenv()
 
@@ -36,6 +38,11 @@ async def restart_server():
 
 
 async def server_restart(update: Update, context: CallbackContext):
+    user_id = update.effective_user.id
+    if not is_user_whitelisted(user_id):
+        await update.message.reply_text('Отказано в доступе.')
+        return
+
     # Определяем имя пользователя, под которым работает скрипт
     user_name = os.popen("whoami").read().strip()
     logger.debug(f"Скрипт выполняется под пользователем: {user_name}")

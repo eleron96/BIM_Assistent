@@ -3,6 +3,7 @@ import coloredlogs
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, CallbackQueryHandler, CommandHandler
 
+from telegram_bot.handlers.security_check import is_user_whitelisted
 from telegram_bot.toggl.stat_by_user import stat_by_user
 from telegram_bot.toggl.stat_by_projects import stat_by_projects
 from telegram_bot.toggl.deadline_info import deadline_info
@@ -24,6 +25,11 @@ function_names = {
 }
 
 async def toggl_menu(update: Update, context: CallbackContext, edit_message=False, from_info=False) -> None:
+    user_id = update.effective_user.id
+    if not is_user_whitelisted(user_id):
+        await update.message.reply_text('Отказано в доступе.')
+        return
+
     keyboard = [
         [
             InlineKeyboardButton("Stat by User", callback_data='stat_by_user'),
