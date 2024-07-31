@@ -1,14 +1,14 @@
-from telegram.ext import CommandHandler, MessageHandler, filters
+from telegram.ext import CommandHandler
 from telegram_bot.handlers.start_handler import start
 from telegram_bot.handlers.help_handler import help_command
 from telegram_bot.handlers.stop_handler import stop_command
 from telegram_bot.handlers.echo_handler import echo
-from telegram_bot.handlers.server_status import server_status
-from telegram_bot.handlers.server_restart import server_restart
-from telegram_bot.handlers.check_rooms_area import check_area_discrepancy_handler
-from telegram_bot.handlers.projects_handler import conv_handler
+from telegram_bot.server.server_status import server_status
+from telegram_bot.server.server_restart import server_restart
+from telegram_bot.speckle.check_rooms_area import check_area_discrepancy_handler
 from telegram_bot.toggl.toggl_menu import toggl_menu, toggl_menu_handler
 from telegram_bot.ai_tools.gpt_handler import gpt_conversation_handler
+
 
 def register_handlers(app):
     app.add_handler(CommandHandler("start", start))
@@ -22,7 +22,6 @@ def register_handlers(app):
 
     # Добавляем CallbackQueryHandler для обработки нажатий кнопок
     app.add_handler(toggl_menu_handler)
-
 
     # app.add_handler(conv_handler)
 
