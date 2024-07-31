@@ -13,7 +13,7 @@ from telegram_bot.ai_tools.gpt_handler import gpt_conversation_handler
 def register_handlers(app):
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(CommandHandler("stop", stop_command))
+    # app.add_handler(CommandHandler("stop", stop_command))
     app.add_handler(check_area_discrepancy_handler)
     app.add_handler(CommandHandler("server", server_status))
     app.add_handler(CommandHandler("restart", server_restart))
@@ -22,6 +22,8 @@ def register_handlers(app):
 
     # Добавляем CallbackQueryHandler для обработки нажатий кнопок
     app.add_handler(toggl_menu_handler)
-    app.add_handler(conv_handler)
+
+
+    # app.add_handler(conv_handler)
 
     # app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
