@@ -47,7 +47,7 @@ async def get_workspace_milestones(session, workspace_id):
 def format_date(date_str):
     try:
         date_obj = datetime.fromisoformat(date_str)
-        return date_obj.strftime('%d %b %y')
+        return date_obj.strftime('%d-%b-%y')
     except ValueError:
         return date_str
 
