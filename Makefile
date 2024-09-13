@@ -37,7 +37,7 @@ deploy_all: package copy deploy
 # Запаковка файлов
 package:
 	@echo "Packaging files..."
-	tar czvf $(ARCHIVE) Dockerfile bot.py main.py pyproject.toml poetry.lock telegram_bot .env
+	tar czvf $(ARCHIVE) Dockerfile bot.py pyproject.toml poetry.lock telegram_bot .env
 
 # Копирование архива на удаленный сервер
 copy:

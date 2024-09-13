@@ -42,7 +42,7 @@ Telegram bot for managing BIM projects with Speckle and Toggl integration.
 4. **Run locally with Poetry**:
     ```bash
     poetry install
-    poetry run python main.py
+    poetry run python bot.py
     ```
 
 ## Usage
