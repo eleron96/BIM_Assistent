@@ -56,9 +56,16 @@ def extract_code_and_name(name):
         code_start = name.find('[') + 1
         code_end = name.find(']')
         code = name[code_start:code_end]
+        # Здесь разделяем строку на части и убираем пробелы
         clean_name = name[code_end + 1:].strip()
-        return code, clean_name
+        # Ищем часть с "оч", которая идет после имени
+        clean_name_parts = clean_name.split('_')
+        # Соединяем часть с очками
+        if len(clean_name_parts) > 1:
+            clean_name = f"{clean_name_parts[0]} {clean_name_parts[1]}"
+        return code, clean_name.strip()
     return '', name
+
 
 async def fetch_milestones():
     async with aiohttp.ClientSession() as session:
