@@ -27,7 +27,7 @@ ASKING = 1
 # Функция для получения ответа от ChatGPT с учетом истории
 def fetch_chatgpt_response(messages):
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-4-turbo",
         messages=messages
     )
     return response.choices[0].message.content.strip()

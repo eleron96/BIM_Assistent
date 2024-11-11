@@ -23,7 +23,8 @@ update: run
 # Создание пакета и отправка на сервер
 # Переменные
 SERVER_USER=root
-SERVER_IP=194.35.119.49
+#SERVER_IP=194.35.119.49
+SERVER_IP=143.198.162.5
 ARCHIVE=telegram_bot_files.tar.gz
 REMOTE_DIR=/root
 DOCKER_IMAGE=telegram_bot:latest
