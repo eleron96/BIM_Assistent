@@ -23,11 +23,7 @@ COPY pyproject.toml poetry.lock ./
 
 # Отключаем создание виртуальных окружений и устанавливаем зависимости проекта
 RUN poetry config virtualenvs.create false
-RUN poetry install --no-dev
-
-# Устанавливаем specklepy через pip
-RUN pip install specklepy
-RUN pip install python-telegram-bot httpx
+RUN poetry install --no-root
 
 # Копируем все остальные файлы проекта
 COPY . .

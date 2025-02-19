@@ -64,4 +64,3 @@ deploy-script:
 clean:
 	@echo "Cleaning up..."
 	rm -f $(ARCHIVE) deploy.sh
-
