@@ -28,6 +28,13 @@ async def get_medium_latest(username: str):
             print(f"Medium latest data: {data}")  # Логируем ответ от API
             return data
 
+async def get_instagram_latest(username: str):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"http://194.35.119.49:8090/instagram/latest?username={username}") as resp:
+            data = await resp.json()
+            print(f"Instagram latest data: {data}")  # Логируем ответ от API
+            return data
+
 async def get_statistics_linkedin(profile_id: str):
     async with aiohttp.ClientSession() as session:
         async with session.get(f"http://194.35.119.49:8090/linkedin/statistics?profile_id={profile_id}") as resp:
@@ -43,12 +50,18 @@ async def get_statistics_medium(username: str):
         async with session.get(f"http://194.35.119.49:8090/medium/statistics?username={username}") as resp:
             return await resp.json()
 
+async def get_statistics_instagram(username: str):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"http://194.35.119.49:8090/instagram/daily-stats?username={username}") as resp:
+            return await resp.json()
+
 
 # Функция для получения данных по подписчикам и форматирования ответа
 async def get_followers_data():
     profile_id = "gamsakhurdiya"  # LinkedIn
     channel_id = "UCRhID0powzDpE4D2KuVKGHg"  # YouTube
     username = "Eleron"  # Medium
+    instagram_username = "nikog_bim"  # Instagram
 
     # Запрашиваем данные с API
     linkedin_data = await get_linkedin_latest(profile_id)
@@ -60,10 +73,14 @@ async def get_followers_data():
     medium_data = await get_medium_latest(username)
     medium_stats = await get_statistics_medium(username)
 
+    instagram_data = await get_instagram_latest(instagram_username)
+    instagram_stats = await get_statistics_instagram(instagram_username)
+
     # Получаем количество подписчиков с правильным парсингом
     linkedin_followers = linkedin_data.get('latest_data', {}).get('count', 'N/A')
     youtube_followers = youtube_data.get('latest_data', {}).get('count', 'N/A')
     medium_followers = medium_data.get('latest_data', {}).get('count', 'N/A')
+    instagram_followers = instagram_data.get('latest_data', {}).get('count', 'N/A')
 
     # Форматируем данные для ответа
     response = f"""
@@ -80,6 +97,10 @@ async def get_followers_data():
 **Medium**:
 - **Подписчиков**: {medium_followers}
 - **Изменения за месяц**: {medium_stats.get('statistics', {}).get('month', 'N/A')}%
+
+**Instagram**:
+- **Подписчиков**: {instagram_followers}
+- **Изменения за месяц**: {instagram_stats.get('statistics', {}).get('month', 'N/A')}%
 """
     return response
 
